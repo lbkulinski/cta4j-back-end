@@ -1,4 +1,4 @@
-name: CTA Bus Service CI
+name: cta4j Back-end CI
 on:
   push:
     branches: [ "main" ]
@@ -16,6 +16,7 @@ jobs:
           java-version: '21'
       - name: Build with Maven
         env:
+          TRAIN_API_KEY: ${{ secrets.TRAIN_API_KEY }}
           BUS_API_KEY: ${{ secrets.BUS_API_KEY }}
           FRONT_END_URL: ${{ secrets.FRONT_END_URL }}
           ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
