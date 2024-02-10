@@ -1,12 +1,10 @@
 package app.cta4j.model;
 
-import app.cta4j.serialization.InstantToStringConverter;
 import app.cta4j.serialization.StringToBooleanConverter;
-import app.cta4j.serialization.StringToInstantConverter;
+import app.cta4j.serialization.TrainStringToInstantConverter;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.time.Instant;
 import java.util.Objects;
@@ -26,13 +24,11 @@ public record Train(
     String station,
 
     @JsonAlias("prdt")
-    @JsonSerialize(converter = InstantToStringConverter.class)
-    @JsonDeserialize(converter = StringToInstantConverter.class)
+    @JsonDeserialize(converter = TrainStringToInstantConverter.class)
     Instant predictionTime,
 
     @JsonAlias("arrT")
-    @JsonSerialize(converter = InstantToStringConverter.class)
-    @JsonDeserialize(converter = StringToInstantConverter.class)
+    @JsonDeserialize(converter = TrainStringToInstantConverter.class)
     Instant arrivalTime,
 
     @JsonAlias("isApp")

@@ -1,5 +1,6 @@
 package app.cta4j.config;
 
+import app.cta4j.client.BusClient;
 import app.cta4j.client.TrainClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -27,5 +28,21 @@ public class HttpClientConfiguration {
                                                                                  .build();
 
         return httpServiceProxyFactory.createClient(TrainClient.class);
+    }
+
+    @Bean
+    public BusClient busClient(@Value("${cta.bus-api-key}") String apiKey) {
+        Objects.requireNonNull(apiKey);
+
+        String baseUrl = "https://ctabustracker.com/bustime/api/v2?key=%s&format=json".formatted(apiKey);
+
+        RestClient restClient = RestClient.create(baseUrl);
+
+        RestClientAdapter restClientAdapter = RestClientAdapter.create(restClient);
+
+        HttpServiceProxyFactory httpServiceProxyFactory = HttpServiceProxyFactory.builderFor(restClientAdapter)
+                                                                                 .build();
+
+        return httpServiceProxyFactory.createClient(BusClient.class);
     }
 }
