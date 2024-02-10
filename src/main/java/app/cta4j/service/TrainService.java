@@ -1,6 +1,7 @@
 package app.cta4j.service;
 
 import app.cta4j.client.TrainClient;
+import app.cta4j.exception.DataFetcherException;
 import app.cta4j.jooq.Tables;
 import app.cta4j.model.*;
 import com.rollbar.notifier.Rollbar;
@@ -9,7 +10,7 @@ import org.jooq.exception.DataAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.graphql.execution.ErrorType;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,14 +33,20 @@ public final class TrainService {
 
     @Autowired
     public TrainService(DSLContext context, TrainClient trainClient, Rollbar rollbar) {
-        this.context = Objects.requireNonNull(context);
+        Objects.requireNonNull(context);
 
-        this.trainClient = Objects.requireNonNull(trainClient);
+        Objects.requireNonNull(trainClient);
 
-        this.rollbar = Objects.requireNonNull(rollbar);
+        Objects.requireNonNull(rollbar);
+
+        this.context = context;
+
+        this.trainClient = trainClient;
+
+        this.rollbar = rollbar;
     }
 
-    public ResponseEntity<Set<Station>> getStations() {
+    public Set<Station> getStations() {
         List<Station> stations;
 
         try {
@@ -53,19 +60,17 @@ public final class TrainService {
 
             TrainService.LOGGER.error(message, e);
 
-            return ResponseEntity.internalServerError()
-                                 .build();
+            throw new DataFetcherException(ErrorType.INTERNAL_ERROR);
         }
 
-        Set<Station> copy = Set.copyOf(stations);
-
-        return ResponseEntity.ok(copy);
+        return Set.copyOf(stations);
     }
 
-    public ResponseEntity<Set<Train>> getTrains(int stationId) {
+    public Set<Train> getTrains(int stationId) {
         if (stationId <= 0) {
-            return ResponseEntity.badRequest()
-                                 .build();
+            String message = "The specified station ID must be positive";
+
+            throw new DataFetcherException(message, ErrorType.BAD_REQUEST);
         }
 
         TrainResponse response;
@@ -79,38 +84,37 @@ public final class TrainService {
 
             TrainService.LOGGER.error(message, e);
 
-            return ResponseEntity.internalServerError()
-                                 .build();
+            throw new DataFetcherException(ErrorType.INTERNAL_ERROR);
         }
 
         if (response == null) {
-            return ResponseEntity.internalServerError()
-                                 .build();
+            throw new DataFetcherException(ErrorType.INTERNAL_ERROR);
         }
 
         TrainBody body = response.body();
 
         if (body == null) {
-            return ResponseEntity.internalServerError()
-                                 .build();
+            throw new DataFetcherException(ErrorType.INTERNAL_ERROR);
         }
 
         Set<Train> trains = body.trains();
 
         if (trains == null) {
-            return ResponseEntity.notFound()
-                                 .build();
+            String message = "Trains with the station ID %d could not found".formatted(stationId);
+
+            this.rollbar.info(message);
+
+            return Set.of();
         }
 
-        Set<Train> copy = Set.copyOf(trains);
-
-        return ResponseEntity.ok(copy);
+        return Set.copyOf(trains);
     }
 
-    public ResponseEntity<Set<Train>> followTrain(int run) {
+    public Set<Train> followTrain(int run) {
         if (run <= 0) {
-            return ResponseEntity.badRequest()
-                                 .build();
+            String message = "The specified run must be positive";
+
+            throw new DataFetcherException(message, ErrorType.BAD_REQUEST);
         }
 
         FollowResponse response;
@@ -124,31 +128,29 @@ public final class TrainService {
 
             TrainService.LOGGER.error(message, e);
 
-            return ResponseEntity.internalServerError()
-                                 .build();
+            throw new DataFetcherException(ErrorType.INTERNAL_ERROR);
         }
 
         if (response == null) {
-            return ResponseEntity.internalServerError()
-                                 .build();
+            throw new DataFetcherException(ErrorType.INTERNAL_ERROR);
         }
 
         FollowBody body = response.body();
 
         if (body == null) {
-            return ResponseEntity.internalServerError()
-                                 .build();
+            throw new DataFetcherException(ErrorType.INTERNAL_ERROR);
         }
 
         Set<Train> trains = body.trains();
 
         if (trains == null) {
-            return ResponseEntity.notFound()
-                                 .build();
+            String message = "A train with the run number %d could not found".formatted(run);
+
+            this.rollbar.info(message);
+
+            return Set.of();
         }
 
-        Set<Train> copy = Set.copyOf(trains);
-
-        return ResponseEntity.ok(copy);
+        return Set.copyOf(trains);
     }
 }

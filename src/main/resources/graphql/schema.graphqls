@@ -1,0 +1,68 @@
+type Station {
+    id: ID!,
+    name: String!
+}
+
+enum Line {
+    RED
+    BLUE
+    BROWN
+    GREEN
+    ORANGE
+    PURPLE
+    PINK
+    YELLOW
+}
+
+type Train {
+    run: Int!
+    line: Line!
+    destination: String!
+    station: String!
+    predictionTime: String!
+    arrivalTime: String!
+    due: Boolean!
+    scheduled: Boolean!
+    delayed: Boolean!
+}
+
+type Route {
+    id: ID!
+    name: String!
+}
+
+type Direction {
+    name: String!
+}
+
+type Stop {
+    id: ID!
+    name: String!
+}
+
+enum Type {
+    ARRIVAL
+    DEPARTURE
+}
+
+type Bus {
+    id: ID!
+    type: Type!
+    stop: String!
+    route: String!
+    destination: String!
+    predictionTime: String!
+    arrivalTime: String!
+    delayed: Boolean!
+}
+
+type Query {
+    getStations: [Station!]!
+    getTrains(stationId: ID!): [Train!]!
+    followTrain(run: Int!): [Train!]!
+    getRoutes: [Route!]!
+    getRouteDirections(id: ID!): [Direction!]!
+    getRouteStops(id: ID!, direction: String!): [Stop!]!
+    getBuses(routeId: ID!, stopId: ID!): [Bus!]!
+    followBus(id: ID!): [Bus!]!
+}
