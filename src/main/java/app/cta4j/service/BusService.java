@@ -201,7 +201,7 @@ public final class BusService {
         Set<Bus> buses = body.buses();
 
         if (buses == null) {
-            String message = "Buses with the ID %s could not found".formatted(id);
+            String message = "A bus with the ID %s could not found".formatted(id);
 
             this.rollbar.info(message);
 
