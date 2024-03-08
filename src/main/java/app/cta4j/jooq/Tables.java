@@ -13,38 +13,38 @@ import app.cta4j.jooq.tables.Stop;
 
 
 /**
- * Convenience access to all tables in cta4j.
+ * Convenience access to all tables in public.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Tables {
 
     /**
-     * The table <code>cta4j.direction</code>.
+     * The table <code>public.direction</code>.
      */
     public static final Direction DIRECTION = Direction.DIRECTION;
 
     /**
-     * The table <code>cta4j.route</code>.
+     * The table <code>public.route</code>.
      */
     public static final Route ROUTE = Route.ROUTE;
 
     /**
-     * The table <code>cta4j.route_direction</code>.
+     * The table <code>public.route_direction</code>.
      */
     public static final RouteDirection ROUTE_DIRECTION = RouteDirection.ROUTE_DIRECTION;
 
     /**
-     * The table <code>cta4j.route_stop</code>.
+     * The table <code>public.route_stop</code>.
      */
     public static final RouteStop ROUTE_STOP = RouteStop.ROUTE_STOP;
 
     /**
-     * The table <code>cta4j.station</code>.
+     * The table <code>public.station</code>.
      */
     public static final Station STATION = Station.STATION;
 
     /**
-     * The table <code>cta4j.stop</code>.
+     * The table <code>public.stop</code>.
      */
     public static final Stop STOP = Stop.STOP;
 }
