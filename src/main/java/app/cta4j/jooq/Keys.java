@@ -25,19 +25,19 @@ import org.jooq.impl.Internal;
 
 /**
  * A class modelling foreign key relationships and constraints of tables in
- * cta4j.
+ * public.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Keys {
 
     // -------------------------------------------------------------------------
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
-    public static final UniqueKey<DirectionRecord> KEY_DIRECTION_PRIMARY = Internal.createUniqueKey(Direction.DIRECTION, DSL.name("KEY_direction_PRIMARY"), new TableField[] { Direction.DIRECTION.ID }, true);
-    public static final UniqueKey<RouteRecord> KEY_ROUTE_PRIMARY = Internal.createUniqueKey(Route.ROUTE, DSL.name("KEY_route_PRIMARY"), new TableField[] { Route.ROUTE.ID }, true);
-    public static final UniqueKey<RouteDirectionRecord> KEY_ROUTE_DIRECTION_PRIMARY = Internal.createUniqueKey(RouteDirection.ROUTE_DIRECTION, DSL.name("KEY_route_direction_PRIMARY"), new TableField[] { RouteDirection.ROUTE_DIRECTION.ROUTE_ID, RouteDirection.ROUTE_DIRECTION.DIRECTION_ID }, true);
-    public static final UniqueKey<RouteStopRecord> KEY_ROUTE_STOP_PRIMARY = Internal.createUniqueKey(RouteStop.ROUTE_STOP, DSL.name("KEY_route_stop_PRIMARY"), new TableField[] { RouteStop.ROUTE_STOP.ROUTE_ID, RouteStop.ROUTE_STOP.DIRECTION_ID, RouteStop.ROUTE_STOP.STOP_ID }, true);
-    public static final UniqueKey<StationRecord> KEY_STATION_PRIMARY = Internal.createUniqueKey(Station.STATION, DSL.name("KEY_station_PRIMARY"), new TableField[] { Station.STATION.ID }, true);
-    public static final UniqueKey<StopRecord> KEY_STOP_PRIMARY = Internal.createUniqueKey(Stop.STOP, DSL.name("KEY_stop_PRIMARY"), new TableField[] { Stop.STOP.ID }, true);
+    public static final UniqueKey<DirectionRecord> DIRECTION_PKEY = Internal.createUniqueKey(Direction.DIRECTION, DSL.name("direction_pkey"), new TableField[] { Direction.DIRECTION.ID }, true);
+    public static final UniqueKey<RouteRecord> ROUTE_PKEY = Internal.createUniqueKey(Route.ROUTE, DSL.name("route_pkey"), new TableField[] { Route.ROUTE.ID }, true);
+    public static final UniqueKey<RouteDirectionRecord> ROUTE_DIRECTION_PKEY = Internal.createUniqueKey(RouteDirection.ROUTE_DIRECTION, DSL.name("route_direction_pkey"), new TableField[] { RouteDirection.ROUTE_DIRECTION.ROUTE_ID, RouteDirection.ROUTE_DIRECTION.DIRECTION_ID }, true);
+    public static final UniqueKey<RouteStopRecord> ROUTE_STOP_PKEY = Internal.createUniqueKey(RouteStop.ROUTE_STOP, DSL.name("route_stop_pkey"), new TableField[] { RouteStop.ROUTE_STOP.ROUTE_ID, RouteStop.ROUTE_STOP.DIRECTION_ID, RouteStop.ROUTE_STOP.STOP_ID }, true);
+    public static final UniqueKey<StationRecord> STATION_PKEY = Internal.createUniqueKey(Station.STATION, DSL.name("station_pkey"), new TableField[] { Station.STATION.ID }, true);
+    public static final UniqueKey<StopRecord> STOP_PKEY = Internal.createUniqueKey(Stop.STOP, DSL.name("stop_pkey"), new TableField[] { Stop.STOP.ID }, true);
 }
