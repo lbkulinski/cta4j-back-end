@@ -123,7 +123,7 @@ public final class TrainsFetcher {
 
         Duration duration = Duration.ofMinutes(1L);
 
-        return Flux.interval(Duration.ZERO, duration)
+        return Flux.interval(duration)
                    .flatMap(tick -> this.client.getTrains(stationId))
                    .map(TrainResponse::body)
                    .map(TrainBody::trains);

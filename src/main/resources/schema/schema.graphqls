@@ -69,5 +69,4 @@ type Query {
 
 type Subscription {
     trainArrivals(stationId: ID!): [Train!]!
-    #busArrivals(routeId: ID!, stopId: ID!): [Bus!]!
 }
