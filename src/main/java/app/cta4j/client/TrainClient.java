@@ -7,7 +7,7 @@ import org.springframework.web.service.annotation.GetExchange;
 
 public interface TrainClient {
     @GetExchange("/ttarrivals.aspx")
-    TrainResponse getTrains(@RequestParam("mapid") int stationId);
+    TrainResponse getTrains(@RequestParam("mapid") String stationId);
 
     @GetExchange("/ttfollow.aspx")
     FollowResponse followTrain(@RequestParam("runnumber") int run);
