@@ -4,14 +4,18 @@ import app.cta4j.client.TrainClient;
 import app.cta4j.model.*;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsQuery;
+import com.netflix.graphql.dgs.DgsSubscription;
 import com.netflix.graphql.dgs.InputArgument;
 import com.netflix.graphql.dgs.exceptions.DgsEntityNotFoundException;
 import com.netflix.graphql.dgs.exceptions.DgsInvalidInputArgumentException;
 import com.rollbar.notifier.Rollbar;
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import reactor.core.publisher.Flux;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 
@@ -41,7 +45,8 @@ public final class TrainsFetcher {
         TrainResponse response;
 
         try {
-            response = this.client.getTrains(stationId);
+            response = this.client.getTrains(stationId)
+                                  .blockFirst();
         } catch (Exception e) {
             this.rollbar.error(e);
 
@@ -110,5 +115,17 @@ public final class TrainsFetcher {
         }
 
         return List.copyOf(trains);
+    }
+
+    @DgsSubscription
+    public Publisher<List<Train>> trainArrivals(@InputArgument String stationId) {
+        Objects.requireNonNull(stationId);
+
+        Duration duration = Duration.ofMinutes(1L);
+
+        return Flux.interval(Duration.ZERO, duration)
+                   .flatMap(tick -> this.client.getTrains(stationId))
+                   .map(TrainResponse::body)
+                   .map(TrainBody::trains);
     }
 }
