@@ -6,12 +6,6 @@ spring:
     driver-class-name: ${JDBC_DRIVER}
   jooq:
     sql-dialect: ${JOOQ_SQL_DIALECT}
-  graphql:
-    graphiql:
-      enabled: false
-    cors:
-      allowed-origins:
-        - ${FRONT_END_URL}
 cta:
   train-api-key: ${TRAIN_API_KEY}
   bus-api-key: ${BUS_API_KEY}
