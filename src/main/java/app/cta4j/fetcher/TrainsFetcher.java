@@ -121,7 +121,7 @@ public final class TrainsFetcher {
     public Publisher<List<Train>> trainArrivals(@InputArgument String stationId) {
         Objects.requireNonNull(stationId);
 
-        Duration duration = Duration.ofMinutes(1L);
+        Duration duration = Duration.ofSeconds(45L);
 
         return Flux.interval(Duration.ZERO, duration)
                    .flatMap(tick -> {
