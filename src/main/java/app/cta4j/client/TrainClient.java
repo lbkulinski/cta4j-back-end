@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
 
 public interface TrainClient {
     @GetExchange("/ttarrivals.aspx")
-    Mono<TrainResponse> getTrains(@RequestParam("mapid") String stationId);
+    TrainResponse getTrains(@RequestParam("mapid") String stationId);
 
     @GetExchange("/ttfollow.aspx")
     FollowResponse followTrain(@RequestParam("runnumber") int run);

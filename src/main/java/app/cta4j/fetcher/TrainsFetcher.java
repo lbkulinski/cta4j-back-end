@@ -46,8 +46,7 @@ public final class TrainsFetcher {
         TrainResponse response;
 
         try {
-            response = this.client.getTrains(stationId)
-                                  .block();
+            response = this.client.getTrains(stationId);
         } catch (Exception e) {
             this.rollbar.error(e);
 
@@ -125,16 +124,23 @@ public final class TrainsFetcher {
         Duration duration = Duration.ofMinutes(1L);
 
         return Flux.interval(Duration.ZERO, duration)
-                   .flatMap(tick -> this.client.getTrains(stationId)
-                                               .onErrorResume(e -> {
-                                                   this.rollbar.error(e);
+                   .flatMap(tick -> {
+                       TrainResponse response;
 
-                                                   String message = e.getMessage();
+                       try {
+                           response = this.client.getTrains(stationId);
+                       } catch (Exception e) {
+                           this.rollbar.error(e);
 
-                                                   TrainsFetcher.LOGGER.error(message, e);
+                           String message = e.getMessage();
 
-                                                   return Mono.empty();
-                                               }))
+                           TrainsFetcher.LOGGER.error(message, e);
+
+                           return Mono.error(e);
+                       }
+
+                       return Mono.just(response);
+                   })
                    .map(TrainResponse::body)
                    .map(TrainBody::trains);
     }
