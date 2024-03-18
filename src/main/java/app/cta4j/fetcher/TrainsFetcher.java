@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.List;
@@ -45,7 +46,8 @@ public final class TrainsFetcher {
         TrainResponse response;
 
         try {
-            response = this.client.getTrains(stationId);
+            response = this.client.getTrains(stationId)
+                                  .block();
         } catch (Exception e) {
             this.rollbar.error(e);
 
@@ -122,8 +124,17 @@ public final class TrainsFetcher {
 
         Duration duration = Duration.ofMinutes(1L);
 
-        return Flux.interval(duration)
-                   .flatMap(tick -> Flux.just(this.client.getTrains(stationId)))
+        return Flux.interval(Duration.ZERO, duration)
+                   .flatMap(tick -> this.client.getTrains(stationId)
+                                               .onErrorResume(e -> {
+                                                   this.rollbar.error(e);
+
+                                                   String message = e.getMessage();
+
+                                                   TrainsFetcher.LOGGER.error(message, e);
+
+                                                   return Mono.empty();
+                                               }))
                    .map(TrainResponse::body)
                    .map(TrainBody::trains);
     }
