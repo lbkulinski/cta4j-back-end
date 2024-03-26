@@ -37,7 +37,7 @@ public final class RoutesFetcher {
     }
 
     @DgsQuery
-    public List<Route> getRoutes() {
+    public List<Route> routes() {
         List<Route> routes;
 
         try {
@@ -58,7 +58,7 @@ public final class RoutesFetcher {
     }
 
     @DgsQuery
-    public List<Direction> getRouteDirections(@InputArgument String id) {
+    public List<Direction> routeDirections(@InputArgument String id) {
         Objects.requireNonNull(id);
 
         List<Direction> directions;
@@ -84,7 +84,7 @@ public final class RoutesFetcher {
     }
 
     @DgsQuery
-    public List<Stop> getRouteStops(@InputArgument String id, @InputArgument String direction) {
+    public List<Stop> routeStops(@InputArgument String id, @InputArgument String direction) {
         Objects.requireNonNull(id);
 
         Objects.requireNonNull(direction);
