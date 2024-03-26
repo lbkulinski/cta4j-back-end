@@ -6,13 +6,18 @@ import app.cta4j.model.BusBody;
 import app.cta4j.model.BusResponse;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsQuery;
+import com.netflix.graphql.dgs.DgsSubscription;
 import com.netflix.graphql.dgs.InputArgument;
 import com.netflix.graphql.dgs.exceptions.DgsEntityNotFoundException;
 import com.rollbar.notifier.Rollbar;
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,7 +41,7 @@ public final class BusesFetcher {
     }
 
     @DgsQuery
-    public List<Bus> getBuses(@InputArgument String routeId, @InputArgument String stopId) {
+    public List<Bus> buses(@InputArgument String routeId, @InputArgument String stopId) {
         Objects.requireNonNull(routeId);
 
         Objects.requireNonNull(stopId);
@@ -75,7 +80,7 @@ public final class BusesFetcher {
     }
 
     @DgsQuery
-    public List<Bus> followBus(@InputArgument String id) {
+    public List<Bus> bus(@InputArgument String id) {
         Objects.requireNonNull(id);
 
         BusResponse response;
@@ -109,5 +114,35 @@ public final class BusesFetcher {
         }
 
         return List.copyOf(buses);
+    }
+
+    @DgsSubscription
+    public Publisher<List<Bus>> busesSubscribe(@InputArgument String routeId, @InputArgument String stopId) {
+        Objects.requireNonNull(routeId);
+
+        Objects.requireNonNull(stopId);
+
+        Duration duration = Duration.ofSeconds(45L);
+
+        return Flux.interval(Duration.ZERO, duration)
+                   .flatMap(tick -> {
+                       BusResponse response;
+
+                       try {
+                           response = this.client.getBuses(routeId, stopId);
+                       } catch (Exception e) {
+                           this.rollbar.error(e);
+
+                           String message = e.getMessage();
+
+                           BusesFetcher.LOGGER.error(message, e);
+
+                           return Mono.error(e);
+                       }
+
+                       return Mono.just(response);
+                   })
+                   .map(BusResponse::body)
+                   .map(BusBody::buses);
     }
 }

@@ -34,7 +34,7 @@ public final class StationsFetcher {
     }
 
     @DgsQuery
-    public List<Station> getStations() {
+    public List<Station> stations() {
         List<Station> stations;
 
         try {

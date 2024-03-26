@@ -57,16 +57,17 @@ type Bus {
 }
 
 type Query {
-    getStations: [Station!]!
-    getTrains(stationId: ID!): [Train!]!
-    followTrain(run: Int!): [Train!]!
-    getRoutes: [Route!]!
-    getRouteDirections(id: ID!): [Direction!]!
-    getRouteStops(id: ID!, direction: String!): [Stop!]!
-    getBuses(routeId: ID!, stopId: ID!): [Bus!]!
-    followBus(id: ID!): [Bus!]!
+    stations: [Station!]!
+    trains(stationId: ID!): [Train!]!
+    train(run: Int!): [Train!]!
+    routes: [Route!]!
+    routeDirections(id: ID!): [Direction!]!
+    routeStops(id: ID!, direction: String!): [Stop!]!
+    buses(routeId: ID!, stopId: ID!): [Bus!]!
+    bus(id: ID!): [Bus!]!
 }
 
 type Subscription {
-    trainArrivals(stationId: ID!): [Train!]!
+    trainsSubscribe(stationId: ID!): [Train!]!
+    busesSubscribe(routeId: ID!, stopId: ID!): [Bus!]!
 }

@@ -40,7 +40,7 @@ public final class TrainsFetcher {
     }
 
     @DgsQuery
-    public List<Train> getTrains(@InputArgument String stationId) {
+    public List<Train> trains(@InputArgument String stationId) {
         Objects.requireNonNull(stationId);
 
         TrainResponse response;
@@ -77,7 +77,7 @@ public final class TrainsFetcher {
     }
 
     @DgsQuery
-    public List<Train> followTrain(@InputArgument Integer run) {
+    public List<Train> train(@InputArgument Integer run) {
         if (run <= 0) {
             String message = "The specified run number is less than or equal to zero";
 
@@ -118,7 +118,7 @@ public final class TrainsFetcher {
     }
 
     @DgsSubscription
-    public Publisher<List<Train>> trainArrivals(@InputArgument String stationId) {
+    public Publisher<List<Train>> trainsSubscribe(@InputArgument String stationId) {
         Objects.requireNonNull(stationId);
 
         Duration duration = Duration.ofSeconds(45L);
