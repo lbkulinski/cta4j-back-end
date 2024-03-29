@@ -14,6 +14,7 @@ import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -27,6 +28,8 @@ public final class BusesFetcher {
 
     private final Rollbar rollbar;
 
+    private final long pollingInterval;
+
     private static final Logger LOGGER;
 
     static {
@@ -34,10 +37,12 @@ public final class BusesFetcher {
     }
 
     @Autowired
-    public BusesFetcher(BusClient client, Rollbar rollbar) {
+    public BusesFetcher(BusClient client, Rollbar rollbar, @Value("${cta.polling-interval}") long pollingInterval) {
         this.client = Objects.requireNonNull(client);
 
         this.rollbar = Objects.requireNonNull(rollbar);
+
+        this.pollingInterval = pollingInterval;
     }
 
     @DgsQuery
@@ -122,7 +127,7 @@ public final class BusesFetcher {
 
         Objects.requireNonNull(stopId);
 
-        Duration duration = Duration.ofSeconds(45L);
+        Duration duration = Duration.ofSeconds(this.pollingInterval);
 
         return Flux.interval(Duration.ZERO, duration)
                    .flatMap(tick -> {
