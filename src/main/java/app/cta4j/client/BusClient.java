@@ -11,5 +11,5 @@ public interface BusClient {
     BusResponse getBuses(@RequestParam("rt") String routeId, @RequestParam("stpid") String stopId);
 
     @GetExchange("/getpredictions")
-    BusResponse followBus(@RequestParam("vid") String id);
+    BusResponse getBus(@RequestParam("vid") String id);
 }

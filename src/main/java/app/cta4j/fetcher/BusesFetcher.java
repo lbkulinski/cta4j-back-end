@@ -19,6 +19,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -45,6 +46,26 @@ public final class BusesFetcher {
         this.pollingInterval = pollingInterval;
     }
 
+    private List<Bus> extractBuses(BusResponse response) {
+        if (response == null) {
+            throw new RuntimeException();
+        }
+
+        BusBody body = response.body();
+
+        if (body == null) {
+            throw new DgsEntityNotFoundException();
+        }
+
+        List<Bus> buses = body.buses();
+
+        if (buses == null) {
+            throw new DgsEntityNotFoundException();
+        }
+
+        return List.copyOf(buses);
+    }
+
     @DgsQuery
     public List<Bus> buses(@InputArgument String routeId, @InputArgument String stopId) {
         Objects.requireNonNull(routeId);
@@ -65,23 +86,7 @@ public final class BusesFetcher {
             throw new RuntimeException(e);
         }
 
-        if (response == null) {
-            throw new RuntimeException();
-        }
-
-        BusBody body = response.body();
-
-        if (body == null) {
-            throw new DgsEntityNotFoundException();
-        }
-
-        List<Bus> buses = body.buses();
-
-        if (buses == null) {
-            throw new DgsEntityNotFoundException();
-        }
-
-        return List.copyOf(buses);
+        return this.extractBuses(response);
     }
 
     @DgsQuery
@@ -91,7 +96,7 @@ public final class BusesFetcher {
         BusResponse response;
 
         try {
-            response = this.client.followBus(id);
+            response = this.client.getBus(id);
         } catch (Exception e) {
             this.rollbar.error(e);
 
@@ -102,23 +107,48 @@ public final class BusesFetcher {
             throw new RuntimeException(e);
         }
 
+        return this.extractBuses(response);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Mono<List<Bus>> getBuses(String routeId, String stopId) {
+        Objects.requireNonNull(routeId);
+
+        Objects.requireNonNull(stopId);
+
+        BusResponse response;
+
+        try {
+            response = this.client.getBuses(routeId, stopId);
+        } catch (Exception e) {
+            this.rollbar.error(e);
+
+            String message = e.getMessage();
+
+            BusesFetcher.LOGGER.error(message, e);
+
+            return Mono.just(Collections.EMPTY_LIST);
+        }
+
         if (response == null) {
-            throw new RuntimeException();
+            return Mono.just(Collections.EMPTY_LIST);
         }
 
         BusBody body = response.body();
 
         if (body == null) {
-            throw new DgsEntityNotFoundException();
+            return Mono.just(Collections.EMPTY_LIST);
         }
 
         List<Bus> buses = body.buses();
 
         if (buses == null) {
-            throw new DgsEntityNotFoundException();
+            buses = Collections.EMPTY_LIST;
         }
 
-        return List.copyOf(buses);
+        List<Bus> copy = List.copyOf(buses);
+
+        return Mono.just(copy);
     }
 
     @DgsSubscription
@@ -130,24 +160,6 @@ public final class BusesFetcher {
         Duration duration = Duration.ofSeconds(this.pollingInterval);
 
         return Flux.interval(Duration.ZERO, duration)
-                   .flatMap(tick -> {
-                       BusResponse response;
-
-                       try {
-                           response = this.client.getBuses(routeId, stopId);
-                       } catch (Exception e) {
-                           this.rollbar.error(e);
-
-                           String message = e.getMessage();
-
-                           BusesFetcher.LOGGER.error(message, e);
-
-                           return Mono.error(e);
-                       }
-
-                       return Mono.just(response);
-                   })
-                   .map(BusResponse::body)
-                   .map(BusBody::buses);
+                   .flatMap(tick -> this.getBuses(routeId, stopId));
     }
 }
