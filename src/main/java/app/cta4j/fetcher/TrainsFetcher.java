@@ -18,6 +18,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -92,7 +93,7 @@ public final class TrainsFetcher {
         FollowResponse response;
 
         try {
-            response = this.client.followTrain(run);
+            response = this.client.getTrain(run);
         } catch (Exception e) {
             this.rollbar.error(e);
 
@@ -122,6 +123,45 @@ public final class TrainsFetcher {
         return List.copyOf(trains);
     }
 
+    @SuppressWarnings("unchecked")
+    private Mono<List<Train>> getTrains(String stationId) {
+        Objects.requireNonNull(stationId);
+
+        TrainResponse response;
+
+        try {
+            response = this.client.getTrains(stationId);
+        } catch (Exception e) {
+            this.rollbar.error(e);
+
+            String message = e.getMessage();
+
+            TrainsFetcher.LOGGER.error(message, e);
+
+            return Mono.just(Collections.EMPTY_LIST);
+        }
+
+        if (response == null) {
+            return Mono.just(Collections.EMPTY_LIST);
+        }
+
+        TrainBody body = response.body();
+
+        if (body == null) {
+            return Mono.just(Collections.EMPTY_LIST);
+        }
+
+        List<Train> trains = body.trains();
+
+        if (trains == null) {
+            trains = Collections.EMPTY_LIST;
+        }
+
+        List<Train> copy = List.copyOf(trains);
+
+        return Mono.just(copy);
+    }
+
     @DgsSubscription
     public Publisher<List<Train>> trainsSubscribe(@InputArgument String stationId) {
         Objects.requireNonNull(stationId);
@@ -129,24 +169,6 @@ public final class TrainsFetcher {
         Duration duration = Duration.ofSeconds(this.pollingInterval);
 
         return Flux.interval(Duration.ZERO, duration)
-                   .flatMap(tick -> {
-                       TrainResponse response;
-
-                       try {
-                           response = this.client.getTrains(stationId);
-                       } catch (Exception e) {
-                           this.rollbar.error(e);
-
-                           String message = e.getMessage();
-
-                           TrainsFetcher.LOGGER.error(message, e);
-
-                           return Mono.error(e);
-                       }
-
-                       return Mono.just(response);
-                   })
-                   .map(TrainResponse::body)
-                   .map(TrainBody::trains);
+                   .flatMap(tick -> this.getTrains(stationId));
     }
 }
