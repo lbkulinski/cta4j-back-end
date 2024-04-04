@@ -6,15 +6,23 @@ package app.cta4j.jooq.tables;
 
 import app.cta4j.jooq.Keys;
 import app.cta4j.jooq.Public;
+import app.cta4j.jooq.tables.Direction.DirectionPath;
+import app.cta4j.jooq.tables.Route.RoutePath;
 import app.cta4j.jooq.tables.records.RouteDirectionRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -88,6 +96,39 @@ public class RouteDirection extends TableImpl<RouteDirectionRecord> {
         this(DSL.name("route_direction"), null);
     }
 
+    public <O extends Record> RouteDirection(Table<O> path, ForeignKey<O, RouteDirectionRecord> childPath, InverseForeignKey<O, RouteDirectionRecord> parentPath) {
+        super(path, childPath, parentPath, ROUTE_DIRECTION);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class RouteDirectionPath extends RouteDirection implements Path<RouteDirectionRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> RouteDirectionPath(Table<O> path, ForeignKey<O, RouteDirectionRecord> childPath, InverseForeignKey<O, RouteDirectionRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private RouteDirectionPath(Name alias, Table<RouteDirectionRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public RouteDirectionPath as(String alias) {
+            return new RouteDirectionPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public RouteDirectionPath as(Name alias) {
+            return new RouteDirectionPath(alias, this);
+        }
+
+        @Override
+        public RouteDirectionPath as(Table<?> alias) {
+            return new RouteDirectionPath(alias.getQualifiedName(), this);
+        }
+    }
+
     @Override
     public Schema getSchema() {
         return aliased() ? null : Public.PUBLIC;
@@ -96,6 +137,35 @@ public class RouteDirection extends TableImpl<RouteDirectionRecord> {
     @Override
     public UniqueKey<RouteDirectionRecord> getPrimaryKey() {
         return Keys.ROUTE_DIRECTION_PKEY;
+    }
+
+    @Override
+    public List<ForeignKey<RouteDirectionRecord, ?>> getReferences() {
+        return Arrays.asList(Keys.ROUTE_DIRECTION__ROUTE_DIRECTION_ROUTE_ID_FKEY, Keys.ROUTE_DIRECTION__ROUTE_DIRECTION_DIRECTION_ID_FKEY);
+    }
+
+    private transient RoutePath _route;
+
+    /**
+     * Get the implicit join path to the <code>public.route</code> table.
+     */
+    public RoutePath route() {
+        if (_route == null)
+            _route = new RoutePath(this, Keys.ROUTE_DIRECTION__ROUTE_DIRECTION_ROUTE_ID_FKEY, null);
+
+        return _route;
+    }
+
+    private transient DirectionPath _direction;
+
+    /**
+     * Get the implicit join path to the <code>public.direction</code> table.
+     */
+    public DirectionPath direction() {
+        if (_direction == null)
+            _direction = new DirectionPath(this, Keys.ROUTE_DIRECTION__ROUTE_DIRECTION_DIRECTION_ID_FKEY, null);
+
+        return _direction;
     }
 
     @Override

@@ -6,15 +6,22 @@ package app.cta4j.jooq.tables;
 
 import app.cta4j.jooq.Keys;
 import app.cta4j.jooq.Public;
+import app.cta4j.jooq.tables.Direction.DirectionPath;
+import app.cta4j.jooq.tables.RouteDirection.RouteDirectionPath;
+import app.cta4j.jooq.tables.RouteStop.RouteStopPath;
 import app.cta4j.jooq.tables.records.RouteRecord;
 
 import java.util.Collection;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -88,6 +95,39 @@ public class Route extends TableImpl<RouteRecord> {
         this(DSL.name("route"), null);
     }
 
+    public <O extends Record> Route(Table<O> path, ForeignKey<O, RouteRecord> childPath, InverseForeignKey<O, RouteRecord> parentPath) {
+        super(path, childPath, parentPath, ROUTE);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class RoutePath extends Route implements Path<RouteRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> RoutePath(Table<O> path, ForeignKey<O, RouteRecord> childPath, InverseForeignKey<O, RouteRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private RoutePath(Name alias, Table<RouteRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public RoutePath as(String alias) {
+            return new RoutePath(DSL.name(alias), this);
+        }
+
+        @Override
+        public RoutePath as(Name alias) {
+            return new RoutePath(alias, this);
+        }
+
+        @Override
+        public RoutePath as(Table<?> alias) {
+            return new RoutePath(alias.getQualifiedName(), this);
+        }
+    }
+
     @Override
     public Schema getSchema() {
         return aliased() ? null : Public.PUBLIC;
@@ -96,6 +136,40 @@ public class Route extends TableImpl<RouteRecord> {
     @Override
     public UniqueKey<RouteRecord> getPrimaryKey() {
         return Keys.ROUTE_PKEY;
+    }
+
+    private transient RouteDirectionPath _routeDirection;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.route_direction</code> table
+     */
+    public RouteDirectionPath routeDirection() {
+        if (_routeDirection == null)
+            _routeDirection = new RouteDirectionPath(this, null, Keys.ROUTE_DIRECTION__ROUTE_DIRECTION_ROUTE_ID_FKEY.getInverseKey());
+
+        return _routeDirection;
+    }
+
+    private transient RouteStopPath _routeStop;
+
+    /**
+     * Get the implicit to-many join path to the <code>public.route_stop</code>
+     * table
+     */
+    public RouteStopPath routeStop() {
+        if (_routeStop == null)
+            _routeStop = new RouteStopPath(this, null, Keys.ROUTE_STOP__ROUTE_STOP_ROUTE_ID_FKEY.getInverseKey());
+
+        return _routeStop;
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>public.direction</code> table
+     */
+    public DirectionPath direction() {
+        return routeDirection().direction();
     }
 
     @Override
