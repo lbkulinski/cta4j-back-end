@@ -6,15 +6,20 @@ package app.cta4j.jooq.tables;
 
 import app.cta4j.jooq.Keys;
 import app.cta4j.jooq.Public;
+import app.cta4j.jooq.tables.RouteStop.RouteStopPath;
 import app.cta4j.jooq.tables.records.StopRecord;
 
 import java.util.Collection;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -88,6 +93,39 @@ public class Stop extends TableImpl<StopRecord> {
         this(DSL.name("stop"), null);
     }
 
+    public <O extends Record> Stop(Table<O> path, ForeignKey<O, StopRecord> childPath, InverseForeignKey<O, StopRecord> parentPath) {
+        super(path, childPath, parentPath, STOP);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class StopPath extends Stop implements Path<StopRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> StopPath(Table<O> path, ForeignKey<O, StopRecord> childPath, InverseForeignKey<O, StopRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private StopPath(Name alias, Table<StopRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public StopPath as(String alias) {
+            return new StopPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public StopPath as(Name alias) {
+            return new StopPath(alias, this);
+        }
+
+        @Override
+        public StopPath as(Table<?> alias) {
+            return new StopPath(alias.getQualifiedName(), this);
+        }
+    }
+
     @Override
     public Schema getSchema() {
         return aliased() ? null : Public.PUBLIC;
@@ -96,6 +134,19 @@ public class Stop extends TableImpl<StopRecord> {
     @Override
     public UniqueKey<StopRecord> getPrimaryKey() {
         return Keys.STOP_PKEY;
+    }
+
+    private transient RouteStopPath _routeStop;
+
+    /**
+     * Get the implicit to-many join path to the <code>public.route_stop</code>
+     * table
+     */
+    public RouteStopPath routeStop() {
+        if (_routeStop == null)
+            _routeStop = new RouteStopPath(this, null, Keys.ROUTE_STOP__ROUTE_STOP_STOP_ID_FKEY.getInverseKey());
+
+        return _routeStop;
     }
 
     @Override

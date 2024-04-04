@@ -6,15 +6,24 @@ package app.cta4j.jooq.tables;
 
 import app.cta4j.jooq.Keys;
 import app.cta4j.jooq.Public;
+import app.cta4j.jooq.tables.Direction.DirectionPath;
+import app.cta4j.jooq.tables.Route.RoutePath;
+import app.cta4j.jooq.tables.Stop.StopPath;
 import app.cta4j.jooq.tables.records.RouteStopRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -93,6 +102,39 @@ public class RouteStop extends TableImpl<RouteStopRecord> {
         this(DSL.name("route_stop"), null);
     }
 
+    public <O extends Record> RouteStop(Table<O> path, ForeignKey<O, RouteStopRecord> childPath, InverseForeignKey<O, RouteStopRecord> parentPath) {
+        super(path, childPath, parentPath, ROUTE_STOP);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class RouteStopPath extends RouteStop implements Path<RouteStopRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> RouteStopPath(Table<O> path, ForeignKey<O, RouteStopRecord> childPath, InverseForeignKey<O, RouteStopRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private RouteStopPath(Name alias, Table<RouteStopRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public RouteStopPath as(String alias) {
+            return new RouteStopPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public RouteStopPath as(Name alias) {
+            return new RouteStopPath(alias, this);
+        }
+
+        @Override
+        public RouteStopPath as(Table<?> alias) {
+            return new RouteStopPath(alias.getQualifiedName(), this);
+        }
+    }
+
     @Override
     public Schema getSchema() {
         return aliased() ? null : Public.PUBLIC;
@@ -101,6 +143,47 @@ public class RouteStop extends TableImpl<RouteStopRecord> {
     @Override
     public UniqueKey<RouteStopRecord> getPrimaryKey() {
         return Keys.ROUTE_STOP_PKEY;
+    }
+
+    @Override
+    public List<ForeignKey<RouteStopRecord, ?>> getReferences() {
+        return Arrays.asList(Keys.ROUTE_STOP__ROUTE_STOP_ROUTE_ID_FKEY, Keys.ROUTE_STOP__ROUTE_STOP_DIRECTION_ID_FKEY, Keys.ROUTE_STOP__ROUTE_STOP_STOP_ID_FKEY);
+    }
+
+    private transient RoutePath _route;
+
+    /**
+     * Get the implicit join path to the <code>public.route</code> table.
+     */
+    public RoutePath route() {
+        if (_route == null)
+            _route = new RoutePath(this, Keys.ROUTE_STOP__ROUTE_STOP_ROUTE_ID_FKEY, null);
+
+        return _route;
+    }
+
+    private transient DirectionPath _direction;
+
+    /**
+     * Get the implicit join path to the <code>public.direction</code> table.
+     */
+    public DirectionPath direction() {
+        if (_direction == null)
+            _direction = new DirectionPath(this, Keys.ROUTE_STOP__ROUTE_STOP_DIRECTION_ID_FKEY, null);
+
+        return _direction;
+    }
+
+    private transient StopPath _stop;
+
+    /**
+     * Get the implicit join path to the <code>public.stop</code> table.
+     */
+    public StopPath stop() {
+        if (_stop == null)
+            _stop = new StopPath(this, Keys.ROUTE_STOP__ROUTE_STOP_STOP_ID_FKEY, null);
+
+        return _stop;
     }
 
     @Override
