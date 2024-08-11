@@ -36,6 +36,7 @@ public enum Line {
             case "P", "PURPLE LINE" -> Line.PURPLE;
             case "PINK", "PINK LINE" -> Line.PINK;
             case "Y", "YELLOW LINE" -> Line.YELLOW;
+            case "N/A" -> null;
             default -> {
                 String message = "A line with the name \"%s\" does not exist".formatted(string);
 

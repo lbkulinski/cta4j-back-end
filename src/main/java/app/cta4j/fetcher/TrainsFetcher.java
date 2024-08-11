@@ -79,7 +79,9 @@ public final class TrainsFetcher {
             throw new DgsEntityNotFoundException();
         }
 
-        return List.copyOf(trains);
+        return trains.stream()
+                     .filter(train -> train.line() != null)
+                     .toList();
     }
 
     @DgsQuery
@@ -120,7 +122,9 @@ public final class TrainsFetcher {
             throw new DgsEntityNotFoundException();
         }
 
-        return List.copyOf(trains);
+        return trains.stream()
+                     .filter(train -> train.line() != null)
+                     .toList();
     }
 
     @SuppressWarnings("unchecked")
@@ -157,7 +161,9 @@ public final class TrainsFetcher {
             trains = Collections.EMPTY_LIST;
         }
 
-        List<Train> copy = List.copyOf(trains);
+        List<Train> copy = trains.stream()
+                                 .filter(train -> train.line() != null)
+                                 .toList();
 
         return Mono.just(copy);
     }
