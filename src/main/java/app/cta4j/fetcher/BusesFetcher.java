@@ -6,22 +6,16 @@ import app.cta4j.model.BusBody;
 import app.cta4j.model.BusResponse;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsQuery;
-import com.netflix.graphql.dgs.DgsSubscription;
 import com.netflix.graphql.dgs.InputArgument;
 import com.netflix.graphql.dgs.exceptions.DgsEntityNotFoundException;
 import com.rollbar.notifier.Rollbar;
-import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
-import java.time.Duration;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @DgsComponent
 public final class BusesFetcher {
@@ -53,7 +47,7 @@ public final class BusesFetcher {
             throw new DgsEntityNotFoundException();
         }
 
-        List<Bus> buses = body.buses();
+        Set<Bus> buses = body.buses();
 
         if (buses == null) {
             throw new DgsEntityNotFoundException();

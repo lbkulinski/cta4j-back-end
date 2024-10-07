@@ -23,7 +23,7 @@ public final class TrainsController {
     }
 
     @GetMapping("/{run}/stations")
-    public ResponseEntity<?> getUpcomingStops(@PathVariable int run) {
+    public ResponseEntity<Set<Train>> getUpcomingStops(@PathVariable int run) {
         Set<Train> stations = this.service.getUpcomingStops(run);
 
         stations = Set.copyOf(stations);

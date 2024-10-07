@@ -30,7 +30,7 @@ public final class StationsService {
     }
 
     public Set<Station> getStations() {
-        List<Station> stations = this.context.select()
+        List<Station> stations = this.context.select(Tables.STATION.asterisk())
                                              .from(Tables.STATION)
                                              .fetchInto(Station.class);
 

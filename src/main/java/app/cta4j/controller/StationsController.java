@@ -33,7 +33,7 @@ public final class StationsController {
     }
 
     @GetMapping("/{stationId}/arrivals")
-    public ResponseEntity<?> getArrivals(@PathVariable int stationId) {
+    public ResponseEntity<Set<Train>> getArrivals(@PathVariable int stationId) {
         Set<Train> stations = this.service.getArrivals(stationId);
 
         stations = Set.copyOf(stations);
