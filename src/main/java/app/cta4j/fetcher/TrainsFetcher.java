@@ -4,31 +4,23 @@ import app.cta4j.client.TrainClient;
 import app.cta4j.model.*;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsQuery;
-import com.netflix.graphql.dgs.DgsSubscription;
 import com.netflix.graphql.dgs.InputArgument;
 import com.netflix.graphql.dgs.exceptions.DgsEntityNotFoundException;
 import com.netflix.graphql.dgs.exceptions.DgsInvalidInputArgumentException;
 import com.rollbar.notifier.Rollbar;
-import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
-import java.time.Duration;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @DgsComponent
 public final class TrainsFetcher {
     private final TrainClient client;
 
     private final Rollbar rollbar;
-
-    private final long pollingInterval;
 
     private static final Logger LOGGER;
 
@@ -37,12 +29,10 @@ public final class TrainsFetcher {
     }
 
     @Autowired
-    public TrainsFetcher(TrainClient client, Rollbar rollbar, @Value("${cta.polling-interval}") long pollingInterval) {
+    public TrainsFetcher(TrainClient client, Rollbar rollbar) {
         this.client = Objects.requireNonNull(client);
 
         this.rollbar = Objects.requireNonNull(rollbar);
-
-        this.pollingInterval = pollingInterval;
     }
 
     @DgsQuery
@@ -73,7 +63,7 @@ public final class TrainsFetcher {
             throw new DgsEntityNotFoundException();
         }
 
-        List<Train> trains = body.trains();
+        Set<Train> trains = body.trains();
 
         if (trains == null) {
             throw new DgsEntityNotFoundException();
@@ -125,56 +115,5 @@ public final class TrainsFetcher {
         return trains.stream()
                      .filter(train -> train.line() != null)
                      .toList();
-    }
-
-    @SuppressWarnings("unchecked")
-    private Mono<List<Train>> getTrains(String stationId) {
-        Objects.requireNonNull(stationId);
-
-        TrainResponse response;
-
-        try {
-            response = this.client.getTrains(stationId);
-        } catch (Exception e) {
-            this.rollbar.error(e);
-
-            String message = e.getMessage();
-
-            TrainsFetcher.LOGGER.error(message, e);
-
-            return Mono.just(Collections.EMPTY_LIST);
-        }
-
-        if (response == null) {
-            return Mono.just(Collections.EMPTY_LIST);
-        }
-
-        TrainBody body = response.body();
-
-        if (body == null) {
-            return Mono.just(Collections.EMPTY_LIST);
-        }
-
-        List<Train> trains = body.trains();
-
-        if (trains == null) {
-            trains = Collections.EMPTY_LIST;
-        }
-
-        List<Train> copy = trains.stream()
-                                 .filter(train -> train.line() != null)
-                                 .toList();
-
-        return Mono.just(copy);
-    }
-
-    @DgsSubscription
-    public Publisher<List<Train>> trainsSubscribe(@InputArgument String stationId) {
-        Objects.requireNonNull(stationId);
-
-        Duration duration = Duration.ofSeconds(this.pollingInterval);
-
-        return Flux.interval(Duration.ZERO, duration)
-                   .flatMap(tick -> this.getTrains(stationId));
     }
 }

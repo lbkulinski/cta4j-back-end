@@ -3,6 +3,7 @@ package app.cta4j.model;
 import app.cta4j.serialization.StringToBooleanConverter;
 import app.cta4j.serialization.TrainStringToInstantConverter;
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
@@ -25,10 +26,12 @@ public record Train(
 
     @JsonAlias("prdt")
     @JsonDeserialize(converter = TrainStringToInstantConverter.class)
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
     Instant predictionTime,
 
     @JsonAlias("arrT")
     @JsonDeserialize(converter = TrainStringToInstantConverter.class)
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
     Instant arrivalTime,
 
     @JsonAlias("isApp")
