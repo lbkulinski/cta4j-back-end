@@ -22,12 +22,12 @@ public final class TrainsController {
         this.service = Objects.requireNonNull(service);
     }
 
-    @GetMapping("/stations/{stationId}")
-    public ResponseEntity<Set<Train>> getTrains(@PathVariable int stationId) {
-        Set<Train> trains = this.service.getTrains(stationId);
+    @GetMapping("/{run}/stations")
+    public ResponseEntity<?> getUpcomingStops(@PathVariable int run) {
+        Set<Train> stations = this.service.getUpcomingStops(run);
 
-        trains = Set.copyOf(trains);
+        stations = Set.copyOf(stations);
 
-        return ResponseEntity.ok(trains);
+        return ResponseEntity.ok(stations);
     }
 }

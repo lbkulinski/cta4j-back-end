@@ -106,7 +106,7 @@ public final class TrainsFetcher {
             throw new DgsEntityNotFoundException();
         }
 
-        List<Train> trains = body.trains();
+        Set<Train> trains = body.trains();
 
         if (trains == null) {
             throw new DgsEntityNotFoundException();

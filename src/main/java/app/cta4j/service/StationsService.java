@@ -1,39 +1,32 @@
 package app.cta4j.service;
 
+import app.cta4j.client.TrainClient;
+import app.cta4j.exception.ResourceNotFoundException;
 import app.cta4j.jooq.Tables;
 import app.cta4j.model.Station;
-import com.rollbar.notifier.Rollbar;
+import app.cta4j.model.Train;
+import app.cta4j.model.TrainBody;
+import app.cta4j.model.TrainResponse;
 import org.jooq.DSLContext;
-import org.jooq.exception.DataAccessException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public final class StationsService {
     private final DSLContext context;
 
-    private final Rollbar rollbar;
-
-    private static final Logger LOGGER;
-
-    static {
-        LOGGER = LoggerFactory.getLogger(StationsService.class);
-    }
+    private final TrainClient client;
 
     @Autowired
-    public StationsService(DSLContext context, Rollbar rollbar) {
+    public StationsService(DSLContext context, TrainClient client) {
         this.context = Objects.requireNonNull(context);
 
-        this.rollbar = Objects.requireNonNull(rollbar);
+        this.client = Objects.requireNonNull(client);
     }
 
     public Set<Station> getStations() {
@@ -42,5 +35,31 @@ public final class StationsService {
                                              .fetchInto(Station.class);
 
         return Set.copyOf(stations);
+    }
+
+    public Set<Train> getArrivals(int stationId) {
+        String stationIdString = Integer.toString(stationId);
+
+        TrainResponse response = this.client.getTrains(stationIdString);
+
+        if (response == null) {
+            throw new IllegalStateException("The train response is null for station ID %s".formatted(stationId));
+        }
+
+        TrainBody body = response.body();
+
+        if (body == null) {
+            throw new ResourceNotFoundException("The train body is null for station ID %s".formatted(stationId));
+        }
+
+        Set<Train> trains = body.trains();
+
+        if (trains == null) {
+            throw new ResourceNotFoundException("The Set of trains is null for station ID %s".formatted(stationId));
+        }
+
+        return trains.stream()
+                     .filter(train -> train.line() != null)
+                     .collect(Collectors.toSet());
     }
 }

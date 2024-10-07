@@ -2,7 +2,7 @@ package app.cta4j.model;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 
-import java.util.List;
+import java.util.Set;
 
-public record FollowBody(@JsonAlias("eta") List<Train> trains) {
+public record FollowBody(@JsonAlias("eta") Set<Train> trains) {
 }

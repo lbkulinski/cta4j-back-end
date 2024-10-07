@@ -1,19 +1,11 @@
 package app.cta4j.service;
 
 import app.cta4j.client.TrainClient;
-import app.cta4j.model.Train;
-import app.cta4j.model.TrainBody;
-import app.cta4j.model.TrainResponse;
-import com.netflix.graphql.dgs.exceptions.DgsEntityNotFoundException;
-import com.rollbar.notifier.Rollbar;
-import org.jooq.DSLContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
+import app.cta4j.exception.ResourceNotFoundException;
+import app.cta4j.model.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -22,39 +14,28 @@ import java.util.stream.Collectors;
 public final class TrainsService {
     private final TrainClient client;
 
-    private Rollbar rollbar;
-
-    private static final Logger LOGGER;
-
-    static {
-        LOGGER = LoggerFactory.getLogger(TrainsService.class);
-    }
-
-    public TrainsService(TrainClient client, Rollbar rollbar) {
+    @Autowired
+    public TrainsService(TrainClient client) {
         this.client = Objects.requireNonNull(client);
-
-        this.rollbar = Objects.requireNonNull(rollbar);
     }
 
-    public Set<Train> getTrains(int stationId) {
-        String stationIdString = Integer.toString(stationId);
-
-        TrainResponse response = client.getTrains(stationIdString);
+    public Set<Train> getUpcomingStops(int run) {
+        FollowResponse response = this.client.getTrain(run);
 
         if (response == null) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new IllegalStateException("The follow response is null for run %d".formatted(run));
         }
 
-        TrainBody body = response.body();
+        FollowBody body = response.body();
 
         if (body == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new ResourceNotFoundException("The follow body is null for run %d".formatted(run));
         }
 
         Set<Train> trains = body.trains();
 
         if (trains == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new ResourceNotFoundException("The Set of trains is null for run %d".formatted(run));
         }
 
         return trains.stream()

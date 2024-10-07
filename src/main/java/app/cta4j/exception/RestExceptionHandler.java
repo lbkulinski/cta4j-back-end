@@ -14,7 +14,7 @@ import org.springframework.web.reactive.result.method.annotation.ResponseEntityE
 import java.util.Objects;
 
 @ControllerAdvice
-public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+public final class RestExceptionHandler extends ResponseEntityExceptionHandler {
     private final Rollbar rollbar;
 
     private static final Logger LOGGER;
@@ -28,8 +28,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         this.rollbar = Objects.requireNonNull(rollbar);
     }
 
-    @ExceptionHandler(value = {DataAccessException.class, RestClientException.class})
-    protected ResponseEntity<?> handleInternalServerError(Exception e) {
+    @ExceptionHandler(value = {DataAccessException.class, RestClientException.class, IllegalStateException.class})
+    private ResponseEntity<?> handleInternalServerError(Exception e) {
         Objects.requireNonNull(e);
 
         this.rollbar.error(e);
@@ -39,6 +39,20 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         RestExceptionHandler.LOGGER.error(message, e);
 
         return ResponseEntity.internalServerError()
+                             .build();
+    }
+
+    @ExceptionHandler(value = {ResourceNotFoundException.class})
+    private ResponseEntity<?> handleNotFound(Exception e) {
+        Objects.requireNonNull(e);
+
+        this.rollbar.error(e);
+
+        String message = e.getMessage();
+
+        RestExceptionHandler.LOGGER.info(message, e);
+
+        return ResponseEntity.notFound()
                              .build();
     }
 }

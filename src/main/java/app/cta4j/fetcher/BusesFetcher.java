@@ -29,8 +29,6 @@ public final class BusesFetcher {
 
     private final Rollbar rollbar;
 
-    private final long pollingInterval;
-
     private static final Logger LOGGER;
 
     static {
@@ -38,12 +36,10 @@ public final class BusesFetcher {
     }
 
     @Autowired
-    public BusesFetcher(BusClient client, Rollbar rollbar, @Value("${cta.polling-interval}") long pollingInterval) {
+    public BusesFetcher(BusClient client, Rollbar rollbar) {
         this.client = Objects.requireNonNull(client);
 
         this.rollbar = Objects.requireNonNull(rollbar);
-
-        this.pollingInterval = pollingInterval;
     }
 
     private List<Bus> extractBuses(BusResponse response) {
@@ -108,58 +104,5 @@ public final class BusesFetcher {
         }
 
         return this.extractBuses(response);
-    }
-
-    @SuppressWarnings("unchecked")
-    private Mono<List<Bus>> getBuses(String routeId, String stopId) {
-        Objects.requireNonNull(routeId);
-
-        Objects.requireNonNull(stopId);
-
-        BusResponse response;
-
-        try {
-            response = this.client.getBuses(routeId, stopId);
-        } catch (Exception e) {
-            this.rollbar.error(e);
-
-            String message = e.getMessage();
-
-            BusesFetcher.LOGGER.error(message, e);
-
-            return Mono.just(Collections.EMPTY_LIST);
-        }
-
-        if (response == null) {
-            return Mono.just(Collections.EMPTY_LIST);
-        }
-
-        BusBody body = response.body();
-
-        if (body == null) {
-            return Mono.just(Collections.EMPTY_LIST);
-        }
-
-        List<Bus> buses = body.buses();
-
-        if (buses == null) {
-            buses = Collections.EMPTY_LIST;
-        }
-
-        List<Bus> copy = List.copyOf(buses);
-
-        return Mono.just(copy);
-    }
-
-    @DgsSubscription
-    public Publisher<List<Bus>> busesSubscribe(@InputArgument String routeId, @InputArgument String stopId) {
-        Objects.requireNonNull(routeId);
-
-        Objects.requireNonNull(stopId);
-
-        Duration duration = Duration.ofSeconds(this.pollingInterval);
-
-        return Flux.interval(Duration.ZERO, duration)
-                   .flatMap(tick -> this.getBuses(routeId, stopId));
     }
 }
