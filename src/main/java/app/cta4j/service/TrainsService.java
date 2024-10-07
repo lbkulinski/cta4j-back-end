@@ -19,7 +19,7 @@ public final class TrainsService {
         this.client = Objects.requireNonNull(client);
     }
 
-    public Set<Train> getUpcomingStops(int run) {
+    public Set<Train> getUpcomingStations(int run) {
         FollowResponse response = this.client.getTrain(run);
 
         if (response == null) {
