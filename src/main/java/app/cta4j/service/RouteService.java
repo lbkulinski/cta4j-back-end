@@ -5,6 +5,7 @@ import app.cta4j.exception.ResourceNotFoundException;
 import app.cta4j.jooq.Tables;
 import app.cta4j.model.*;
 import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +35,7 @@ public final class RouteService {
     }
 
     public Set<Direction> getDirections(String routeId) {
-        List<Direction> directions = this.context.select(Tables.ROUTE_DIRECTION.asterisk())
+        List<Direction> directions = this.context.select(DSL.upper(Tables.DIRECTION.NAME))
                                                  .from(Tables.ROUTE_DIRECTION)
                                                  .join(Tables.DIRECTION)
                                                  .on(Tables.DIRECTION.ID.eq(Tables.ROUTE_DIRECTION.DIRECTION_ID))
