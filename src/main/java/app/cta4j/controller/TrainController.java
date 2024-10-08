@@ -44,7 +44,7 @@ public final class TrainController {
             description = "Successfully retrieved the list of upcoming stations.",
             content = @Content(
                 mediaType = "application/json",
-                array = @ArraySchema(schema = @Schema(implementation = Bus.class))
+                array = @ArraySchema(schema = @Schema(implementation = Train.class))
             )
         ),
         @ApiResponse(responseCode = "404", description = "Train run not found.", content = @Content),

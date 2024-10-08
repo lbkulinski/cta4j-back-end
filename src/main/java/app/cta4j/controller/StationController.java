@@ -69,7 +69,7 @@ public final class StationController {
             description = "Successfully retrieved the list of upcoming train arrivals.",
             content = @Content(
                 mediaType = "application/json",
-                array = @ArraySchema(schema = @Schema(implementation = Station.class))
+                array = @ArraySchema(schema = @Schema(implementation = Train.class))
             )
         ),
         @ApiResponse(responseCode = "404", description = "Station not found.", content = @Content),
