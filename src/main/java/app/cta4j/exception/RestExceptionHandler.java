@@ -6,15 +6,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.reactive.result.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.Objects;
 
-@ControllerAdvice
-public final class RestExceptionHandler extends ResponseEntityExceptionHandler {
+@RestControllerAdvice
+public final class RestExceptionHandler {
     private final Rollbar rollbar;
 
     private static final Logger LOGGER;

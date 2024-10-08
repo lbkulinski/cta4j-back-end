@@ -11,11 +11,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public final class TrainsService {
+public final class TrainService {
     private final TrainClient client;
 
     @Autowired
-    public TrainsService(TrainClient client) {
+    public TrainService(TrainClient client) {
         this.client = Objects.requireNonNull(client);
     }
 

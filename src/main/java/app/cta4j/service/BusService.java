@@ -12,11 +12,11 @@ import java.util.Objects;
 import java.util.Set;
 
 @Service
-public final class BusesService {
+public final class BusService {
     private final BusClient client;
 
     @Autowired
-    public BusesService(BusClient client) {
+    public BusService(BusClient client) {
         this.client = Objects.requireNonNull(client);
     }
 

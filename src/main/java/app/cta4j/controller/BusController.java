@@ -1,7 +1,7 @@
 package app.cta4j.controller;
 
 import app.cta4j.model.Bus;
-import app.cta4j.service.BusesService;
+import app.cta4j.service.BusService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,10 +13,10 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/buses")
-public final class BusesController {
-    private final BusesService service;
+public final class BusController {
+    private final BusService service;
 
-    public BusesController(BusesService service) {
+    public BusController(BusService service) {
         this.service = Objects.requireNonNull(service);
     }
 

@@ -4,7 +4,7 @@ import app.cta4j.model.Bus;
 import app.cta4j.model.Direction;
 import app.cta4j.model.Route;
 import app.cta4j.model.Stop;
-import app.cta4j.service.RoutesService;
+import app.cta4j.service.RouteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,11 +17,11 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/routes")
-public final class RoutesController {
-    private final RoutesService service;
+public final class RouteController {
+    private final RouteService service;
 
     @Autowired
-    public RoutesController(RoutesService service) {
+    public RouteController(RouteService service) {
         this.service = Objects.requireNonNull(service);
     }
 

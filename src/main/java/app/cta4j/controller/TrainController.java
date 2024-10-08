@@ -1,7 +1,7 @@
 package app.cta4j.controller;
 
 import app.cta4j.model.Train;
-import app.cta4j.service.TrainsService;
+import app.cta4j.service.TrainService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,11 +14,11 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/trains")
-public final class TrainsController {
-    private final TrainsService service;
+public final class TrainController {
+    private final TrainService service;
 
     @Autowired
-    public TrainsController(TrainsService service) {
+    public TrainController(TrainService service) {
         this.service = Objects.requireNonNull(service);
     }
 

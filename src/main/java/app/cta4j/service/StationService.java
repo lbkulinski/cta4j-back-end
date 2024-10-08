@@ -17,13 +17,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public final class StationsService {
+public final class StationService {
     private final DSLContext context;
 
     private final TrainClient client;
 
     @Autowired
-    public StationsService(DSLContext context, TrainClient client) {
+    public StationService(DSLContext context, TrainClient client) {
         this.context = Objects.requireNonNull(context);
 
         this.client = Objects.requireNonNull(client);

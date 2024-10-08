@@ -13,13 +13,13 @@ import java.util.Objects;
 import java.util.Set;
 
 @Service
-public final class RoutesService {
+public final class RouteService {
     private final DSLContext context;
 
     private final BusClient client;
 
     @Autowired
-    public RoutesService(DSLContext context, BusClient client) {
+    public RouteService(DSLContext context, BusClient client) {
         this.context = Objects.requireNonNull(context);
 
         this.client = Objects.requireNonNull(client);
