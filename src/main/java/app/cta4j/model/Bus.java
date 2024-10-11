@@ -2,6 +2,7 @@ package app.cta4j.model;
 
 import app.cta4j.serialization.BusStringToInstantConverter;
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -40,6 +41,7 @@ public record Bus(
     )
     @JsonAlias("tmstmp")
     @JsonDeserialize(converter = BusStringToInstantConverter.class)
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
     Instant predictionTime,
 
     @Schema(
@@ -49,6 +51,7 @@ public record Bus(
     )
     @JsonAlias("prdtm")
     @JsonDeserialize(converter = BusStringToInstantConverter.class)
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
     Instant arrivalTime,
 
     @Schema(description = "Indicates whether the bus is delayed.")

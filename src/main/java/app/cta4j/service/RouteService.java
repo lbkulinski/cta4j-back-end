@@ -46,7 +46,7 @@ public final class RouteService {
     }
 
     public Set<Stop> getStops(String routeId, String direction) {
-        List<Stop> stops = this.context.select(Tables.ROUTE_STOP.asterisk())
+        List<Stop> stops = this.context.select(Tables.STOP.asterisk())
                                        .from(Tables.ROUTE_STOP)
                                        .join(Tables.DIRECTION)
                                        .on(Tables.DIRECTION.ID.eq(Tables.ROUTE_STOP.DIRECTION_ID))
