@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Objects;
 
-@Schema(description = "Represents a train station and its details.")
+@Schema(description = "Represents a train station and its details.", requiredProperties = {"id", "name"})
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record Station(
     @Schema(description = "The unique identifier of the station.")

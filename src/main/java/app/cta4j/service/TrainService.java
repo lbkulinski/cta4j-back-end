@@ -39,7 +39,7 @@ public final class TrainService {
         }
 
         return trains.stream()
-                     .filter(train -> train.line() != null)
+                     .filter(train -> train.line() != Line.N_A)
                      .collect(Collectors.toSet());
     }
 }

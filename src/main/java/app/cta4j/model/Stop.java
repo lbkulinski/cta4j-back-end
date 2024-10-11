@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Objects;
 
-@Schema(description = "Represents a stop on a route.")
+@Schema(description = "Represents a stop on a route.", requiredProperties = {"id", "name"})
 public record Stop(
     @Schema(description = "The unique identifier of the stop.")
     @JsonAlias("stpid")

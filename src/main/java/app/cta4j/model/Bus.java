@@ -8,7 +8,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import java.util.Objects;
 
-@Schema(description = "Represents a bus and its schedule information.")
+@Schema(
+    description = "Represents a bus and its schedule information.",
+    requiredProperties = {"id", "type", "stop", "route", "destination", "predictionTime", "arrivalTime", "delayed"}
+)
 public record Bus(
     @Schema(description = "The unique identifier of the bus.")
     @JsonAlias("vid")
@@ -60,5 +63,9 @@ public record Bus(
         Objects.requireNonNull(route);
 
         Objects.requireNonNull(destination);
+
+        Objects.requireNonNull(predictionTime);
+
+        Objects.requireNonNull(arrivalTime);
     }
 }

@@ -3,10 +3,7 @@ package app.cta4j.service;
 import app.cta4j.client.TrainClient;
 import app.cta4j.exception.ResourceNotFoundException;
 import app.cta4j.jooq.Tables;
-import app.cta4j.model.Station;
-import app.cta4j.model.Train;
-import app.cta4j.model.TrainBody;
-import app.cta4j.model.TrainResponse;
+import app.cta4j.model.*;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,7 +56,7 @@ public final class StationService {
         }
 
         return trains.stream()
-                     .filter(train -> train.line() != null)
+                     .filter(train -> train.line() != Line.N_A)
                      .collect(Collectors.toSet());
     }
 }

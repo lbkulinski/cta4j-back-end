@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Objects;
 
-@Schema(description = "Represents the different transit lines in the system.", enumAsRef = true)
+@Schema(description = "Represents the different transit lines in the system.")
 public enum Line {
     @Schema(description = """
         The Red Line provides 24-hour train service between Howard on the North Side and 95th/Dan Ryan on the South \
@@ -44,7 +44,12 @@ public enum Line {
         The Yellow Line route provides rapid transit train service between Dempster-Skokie (in Skokie, IL) and Howard \
         (in Chicago), with connecting service to downtown Chicago via Purple Line Express or Red Line. This line is \
         also commonly known by its original service name: the "Skokie Swift.\"""")
-    YELLOW;
+    YELLOW,
+
+    @Schema(description = """
+        Represents a line that is not applicable. This is occasionally returned by the CTA API, but I am not sure \
+        why at the moment.""")
+    N_A;
 
     @JsonCreator
     public static Line parseString(String string) {
@@ -61,7 +66,7 @@ public enum Line {
             case "P", "PURPLE LINE" -> Line.PURPLE;
             case "PINK", "PINK LINE" -> Line.PINK;
             case "Y", "YELLOW LINE" -> Line.YELLOW;
-            case "N/A" -> null;
+            case "N/A" -> Line.N_A;
             default -> {
                 String message = "A line with the name \"%s\" does not exist".formatted(string);
 

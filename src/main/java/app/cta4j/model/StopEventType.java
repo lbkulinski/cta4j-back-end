@@ -5,11 +5,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Objects;
 
-@Schema(
-    description = """
-        Represents the type of stop event, indicating whether the vehicle is arriving at or departing from a stop.""",
-    enumAsRef = true
-)
+@Schema(description = """
+    Represents the type of stop event, indicating whether the vehicle is arriving at or departing from a stop.""")
 public enum StopEventType {
     @Schema(description = "The vehicle is arriving at the stop.")
     ARRIVAL,

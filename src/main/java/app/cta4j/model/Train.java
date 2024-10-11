@@ -11,14 +11,18 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import java.util.Objects;
 
-@Schema(description = "Represents a train and its schedule information.")
+@Schema(
+    description = "Represents a train and its schedule information.",
+    requiredProperties = {"run", "line", "destination", "station", "predictionTime", "arrivalTime", "due", "scheduled",
+        "delayed"}
+)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record Train(
     @Schema(description = "The unique run number of the train.")
     @JsonAlias("rn")
     int run,
 
-    @Schema(description = "The line on which the train operates.", nullable = true, example = "RED")
+    @Schema(description = "The line on which the train operates.", example = "RED")
     @JsonAlias("rt")
     Line line,
 
@@ -66,6 +70,8 @@ public record Train(
     boolean delayed
 ) {
     public Train {
+        Objects.requireNonNull(line);
+
         Objects.requireNonNull(destination);
 
         Objects.requireNonNull(station);
