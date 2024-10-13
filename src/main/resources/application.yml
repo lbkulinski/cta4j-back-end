@@ -9,7 +9,6 @@ spring:
 cta:
   train-api-key: ${TRAIN_API_KEY}
   bus-api-key: ${BUS_API_KEY}
-  polling-interval: ${POLLING_INTERVAL:45}
 rollbar:
   access-token: ${ROLLBAR_ACCESS_TOKEN}
   environment: ${ROLLBAR_ENVIRONMENT}

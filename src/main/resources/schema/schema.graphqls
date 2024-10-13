@@ -66,8 +66,3 @@ type Query {
     buses(routeId: ID!, stopId: ID!): [Bus!]!
     bus(id: ID!): [Bus!]!
 }
-
-type Subscription {
-    trainsSubscribe(stationId: ID!): [Train!]!
-    busesSubscribe(routeId: ID!, stopId: ID!): [Bus!]!
-}
