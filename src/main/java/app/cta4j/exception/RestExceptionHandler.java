@@ -45,8 +45,6 @@ public final class RestExceptionHandler {
     private ResponseEntity<?> handleNotFound(Exception e) {
         Objects.requireNonNull(e);
 
-        this.rollbar.error(e);
-
         String message = e.getMessage();
 
         RestExceptionHandler.LOGGER.info(message, e);
