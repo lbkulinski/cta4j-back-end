@@ -6,6 +6,7 @@ import app.cta4j.jooq.Tables;
 import app.cta4j.model.*;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public final class StationService {
+public class StationService {
     private final DSLContext context;
 
     private final TrainClient client;
@@ -26,6 +27,7 @@ public final class StationService {
         this.client = Objects.requireNonNull(client);
     }
 
+    @Cacheable("stations")
     public Set<Station> getStations() {
         List<Station> stations = this.context.select(Tables.STATION.asterisk())
                                              .from(Tables.STATION)

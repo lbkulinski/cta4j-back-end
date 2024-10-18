@@ -7,6 +7,7 @@ import app.cta4j.model.*;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Service
-public final class RouteService {
+public class RouteService {
     private final DSLContext context;
 
     private final BusClient client;
@@ -26,6 +27,7 @@ public final class RouteService {
         this.client = Objects.requireNonNull(client);
     }
 
+    @Cacheable("routes")
     public Set<Route> getRoutes() {
         List<Route> routes = this.context.select(Tables.ROUTE.asterisk())
                                          .from(Tables.ROUTE)
@@ -34,6 +36,7 @@ public final class RouteService {
         return Set.copyOf(routes);
     }
 
+    @Cacheable("directions")
     public Set<Direction> getDirections(String routeId) {
         List<Direction> directions = this.context.select(DSL.upper(Tables.DIRECTION.NAME))
                                                  .from(Tables.ROUTE_DIRECTION)
@@ -45,6 +48,7 @@ public final class RouteService {
         return Set.copyOf(directions);
     }
 
+    @Cacheable("stops")
     public Set<Stop> getStops(String routeId, String direction) {
         List<Stop> stops = this.context.select(Tables.STOP.asterisk())
                                        .from(Tables.ROUTE_STOP)
