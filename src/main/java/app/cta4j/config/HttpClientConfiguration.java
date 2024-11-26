@@ -2,6 +2,8 @@ package app.cta4j.config;
 
 import app.cta4j.client.BusClient;
 import app.cta4j.client.TrainClient;
+import app.cta4j.service.SecretService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,9 +15,22 @@ import java.util.Objects;
 
 @Configuration
 public class HttpClientConfiguration {
+    private final SecretService secretService;
+
+    @Autowired
+    public HttpClientConfiguration(SecretService secretService) {
+        this.secretService = Objects.requireNonNull(secretService);
+    }
+
     @Bean
-    public TrainClient trainClient(@Value("${cta.train-api-key}") String apiKey) {
-        Objects.requireNonNull(apiKey);
+    public TrainClient trainClient() {
+        String key = "TRAIN_API_KEY";
+
+        String apiKey = this.secretService.getSecret(key);
+
+        if (apiKey == null) {
+            throw new IllegalStateException("TRAIN_API_KEY is required");
+        }
 
         String baseUrl = """
         https://lapi.transitchicago.com/api/1.0?key=%s&outputType=json""".formatted(apiKey);
@@ -31,8 +46,14 @@ public class HttpClientConfiguration {
     }
 
     @Bean
-    public BusClient busClient(@Value("${cta.bus-api-key}") String apiKey) {
-        Objects.requireNonNull(apiKey);
+    public BusClient busClient() {
+        String key = "BUS_API_KEY";
+
+        String apiKey = this.secretService.getSecret(key);
+
+        if (apiKey == null) {
+            throw new IllegalStateException("BUS_API_KEY is required");
+        }
 
         String baseUrl = "https://ctabustracker.com/bustime/api/v2?key=%s&format=json".formatted(apiKey);
 
