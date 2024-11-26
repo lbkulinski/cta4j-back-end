@@ -22,7 +22,7 @@ public class JooqConfiguration {
     }
 
     @Bean
-    public DefaultConfiguration defaultConfiguration() {
+    public DataSource dataSource() {
         HikariConfig hikariConfig = new HikariConfig();
 
         String url = this.secretService.getSecret("JDBC_URL");
@@ -53,8 +53,11 @@ public class JooqConfiguration {
 
         hikariConfig.setDriverClassName(driverClassName);
 
-        DataSource dataSource = new HikariDataSource(hikariConfig);
+        return new HikariDataSource(hikariConfig);
+    }
 
+    @Bean
+    public DefaultConfiguration defaultConfiguration(DataSource dataSource) {
         DefaultConfiguration configuration = new DefaultConfiguration();
 
         configuration.setDataSource(dataSource);
