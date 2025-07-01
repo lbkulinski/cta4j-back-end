@@ -2,6 +2,9 @@ name: cta4j Back-end CI
 on:
   push:
     branches: [ "main" ]
+concurrency:
+  group: deploy-main
+  cancel-in-progress: true
 jobs:
   build:
     name: Build with Maven
